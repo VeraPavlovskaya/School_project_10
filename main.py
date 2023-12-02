@@ -6,10 +6,10 @@ from flask_login import login_user
 from flask_login import login_required
 from flask_login import logout_user
 from flask_login import current_user
-
-from forms.news import NewsForm
+#from forms.diagram import Diagr
+from forms.events import EventsForm
 from forms.user import RegisterForm, LoginForm
-from data.news import News
+from data.events import Events
 from data.users import User
 from data import db_session
 
@@ -44,73 +44,70 @@ def logout():
     return redirect("/")
 
 
-@app.route('/news', methods=['GET', 'POST'])
+@app.route('/events', methods=['GET', 'POST'])
 @login_required
-def add_news():
-    form = NewsForm()
+def add_events():
+    form = EventsForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        news = News()
-        news.title = form.title.data
-        news.content = form.content.data
-        news.is_private = form.is_private.data
-        current_user.news.append(news)
+        events = Events()
+        events.title = form.title.data
+        events.content = form.content.data
+        events.is_private = form.is_private.data
+        current_user.events.append(events)
         db_sess.merge(current_user)
         db_sess.commit()
-        return redirect('/notes')
-    return render_template('news.html', title='Добавление новости', form=form)
+        return redirect('/events')
+    return render_template('events.html', title='Добавление новости', form=form)
 
 
-@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
+@app.route('/events_delete/<int:id>', methods=['GET', 'POST'])
 @login_required
-def news_delete(id):
+def events_delete(id):
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.id == id, News.user == current_user).first()
-    if news:
-        db_sess.delete(news)
+    events = db_sess.query(Events).filter(Events.id == id, Events.user == current_user).first()
+    if events:
+        db_sess.delete(events)
         db_sess.commit()
     else:
         abort(404)
-    return redirect('/notes')
+    return redirect('/events')
 
 
-@app.route('/news/<int:id>', methods=['GET', 'POST'])
+@app.route('/events/<int:id>', methods=['GET', 'POST'])
 @login_required
-def edit_news(id):
-    form = NewsForm()
+def edit_events(id):
+    form = EventsForm()
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.id == id, News.user == current_user).first()
+    events = db_sess.query(Events).filter(Events.id == id, Events.user == current_user).first()
     if request.method == "GET":
-        # db_sess = db_session.create_session()
-        # news = db_sess.query(News).filter(News.id == id, News.user == current_user).first()
-        if news:
-            form.title.data = news.title
-            form.content.data = news.content
-            form.is_private.data = news.is_private
+        if events:
+            form.title.data = events.title
+            form.content.data = events.content
+            form.is_private.data = events.is_private
         else:
             abort(404)
     if form.validate_on_submit():
-        # db_sess = db_session.create_session()
-        # news = db_sess.query(News).filter(News.id == id, News.user == current_user).first()
-        if news:
-            news.title = form.title.data
-            news.content = form.content.data
-            news.is_private = form.is_private.data
+        if events:
+            events.title = form.title.data
+            events.content = form.content.data
+            events.is_private = form.is_private.data
             db_sess.commit()
-            return redirect('/notes')
+            return redirect('/events')
         else:
             abort(404)
-    return render_template('news.html', title='Редактирование заметки', form=form)
+    return render_template('events.html', title='Редактирование заметки', form=form)
 
 
-@app.route("/notes")
-def notes():
+@app.route("/events")
+def events():
     db_sess = db_session.create_session()
-    if current_user.is_authenticated:
-        news = db_sess.query(News).filter((News.user == current_user) | (News.is_private != True))
-    else:
-        news = db_sess.query(News).filter(News.is_private != True)
-    return render_template("notes.html", news=news)
+    #if current_user.is_authenticated:
+    print(current_user)
+    events = db_sess.query(Events).filter((Events.user == current_user) | (Events.is_private != True))
+    #else:
+    #   events = db_sess.query(Events).filter(Events.is_private != True)
+    return render_template("notes.html", events=events)
 
 
 @app.route('/register', methods=['GET', 'POST'])

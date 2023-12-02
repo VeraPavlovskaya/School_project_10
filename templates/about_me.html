@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>
+        Список мероприятий
+    </h1>
+    <p>
+
+        Ознакомиться со всеми моими проектами или конкретно с проектом Web можно перейдя по ссылке на Github:
+    </p>
+    <ul class="nav">
+  <li class="active">
+    <a href="https://github.com/VeraPavlovskaya">https://github.com/VeraPavlovskaya</a>
+  </li>
+  <li><a href="https://github.com/VeraPavlovskaya/Web_project/tree/master">https://github.com/VeraPavlovskaya/Web_project/tree/master</a></li>
+</ul>
+
+    <div class="go_to_homepage">
+        <a class="go_to_homepage" href="{{url_for('Geo_Core')}}"> Перейти на главную</a>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>
+        Прошедшие мероприятия
+    </h1>
+    <div class="pic">
+        <img src="static/images/map_subjects.jpg">
+        <a href="static/images/map_subjects.jpg" download> Скачать картинку</a>
+    </div>
+
+    <div class="pic">
+        <img src="static/images/map_rivers.jpg">
+        <a href="static/images/map_rivers.jpg" download> Скачать картинку</a>
+    </div>
+
+    <div class="pic">
+        <img src="static/images/world_map.gif">
+        <a href="static/images/world_map.gif" download> Скачать картинку</a>
+    </div>
+
+    <div class="pic">
+        <img src="static/images/map_Evraziya.jpg">
+        <a href="static/images/map_Evraziya.jpg" download> Скачать картинку</a>
+    </div>
+
+    <div class="pic">
+        <img src="static/images/map_avstralia.jpg">
+        <a href="static/images/map_avstralia.jpg" download> Скачать картинку</a>
+    </div>
+
+
+    <div class="go_to_homepage">
+        <a class="go_to_homepage" href="{{url_for('Geo_Core')}}"> Перейти на главную</a>
+    </div>
+{% endblock %}

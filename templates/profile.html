@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/styles.css')}}">
+<h1>Профиль</h1>
+    <center>
+        <div class="box">
+            <img src="static/My_pic.jpg">
+            <input type="file" name="" id="file" accept="image/*">
+            <label for="file">Edit pic</label>
+            <input type="text" name="" placeholder="Name">
+            <input type="email" name="" placeholder="Email id">
+            <input type="text" name="" placeholder="School number">
+            <input type="text" name="" placeholder="Class number">
+            <input type="text" name="" placeholder="City">
+            <button style="float: left;margin:10px 0 0 18.2%;">Cancel</button>
+            <button style="float: right;margin:10px 18.2% 0 0;">Done</button>
+        </div>
+    </center>
+{% endblock %}

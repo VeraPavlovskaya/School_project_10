@@ -1,0 +1,13 @@
+img{
+width: 100%;
+}
+.pic {
+width: 20%;
+height: 200px;
+display: inline-block;
+border: 2px solid black;
+border-radius: 5px;
+}
+a {text-align: center;
+    padding: 5px;}
+h1 {text-align: center;}

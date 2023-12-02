@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+     <div>
+          <label for="address">Поиск события: <input type="text" id="address" style="width: 500px;"> </label>
+		  <button id="search_button" class="button process" onclick="region_search()">Найти</button> &nbsp; &nbsp;
+		  <label> Результаты вашего запроса - </label>
+		  <label id="subject"> . . . </label>
+		  <br>
+    </div>
+
+    <div id="map" style="width: 1100px; height: 700px"></div>
+
+    <div class="go_to_homepage">
+        <a class="go_to_homepage" href="{{url_for('Geo_Core')}}"> Перейти на главную</a>
+    </div>
+
+    <script type="text/javascript">
+        ymaps.ready(init);
+
+        var myMap
+								  
+        function init() {
+            console.log("Init");
+			
+            // Инициализируем карту
+		    myMap = new ymaps.Map('map', { center: [70, 102],
+                                             zoom: 3,
+											 //type: null,
+                                             controls: ['zoomControl']
+                                            }
+                                  );
+            myMap.controls.get('zoomControl').options.set({size: 'small'});								  
+		  
+            // Отрегулируем яркость всех стран на карте (сделаем их более бледными)
+			// Прогрузим границы регионов; "001" - весь мир
+			ymaps.borders.load("001", {
+				lang: "ru",
+				quality: 2
+			}).then(function (geojson) {
+			  var regions = ymaps.geoQuery(geojson).setOptions({fillOpacity: '0.5',
+														        strokeOpacity: '0.9',
+														        fillColor: '#f7f7f7',
+														        strokeColor: '#f7f7f7'
+														       });
+			  // Отобразим границы на карте
+			  regions.addToMap(myMap);
+			});
+            // Раскрасим регионы России в 5 цветов
+			var colors = ['#DB6A91', '#F0AFE4', '#FF82B3', '#F09FC4', '#C00758'];		  
+          
+		    var objectManager = new ymaps.ObjectManager();
+			// Загрузим регионы.
+			ymaps.borders.load('RU', {
+				lang: 'ru',
+				quality: 2
+			}).then(function (result) {
+				// Очередь раскраски.
+				var queue = [];
+				// Создадим объект regions, где ключи это ISO код региона.
+				var regions = result.features.reduce(function (acc, feature) {
+					// Добавим ISO код региона в качестве feature.id для objectManager.
+					var iso = feature.properties.iso3166;
+					feature.id = iso;
+					// Добавим опции региона по умолчанию.
+					feature.options = {
+						fillOpacity: 0.6,
+						strokeColor: '#204BC0',
+						strokeOpacity: 0.5
+					};
+					acc[iso] = feature;
+					return acc;
+				}, {});
+
+				// Функция, которая раскрашивает регион и добавляет всех нераскрасшенных соседей в очередь на раскраску.
+				function paint(iso) {
+					var allowedColors = colors.slice();
+					// Получим ссылку на раскрашиваемый регион и на его соседей.
+					var region = regions[iso];
+					var neighbors = region.properties.neighbors;
+					// Если у региона есть опция fillColor, значит мы его уже раскрасили.
+					if (region.options.fillColor) {
+						return;
+					}
+					// Если у региона есть соседи, то нужно проверить, какие цвета уже заняты.
+					if (neighbors.length !== 0) {
+						neighbors.forEach(function (neighbor) {
+							var fillColor = regions[neighbor].options.fillColor;
+							// Если регион раскрашен, то исключаем его цвет.
+							if (fillColor) {
+								var index = allowedColors.indexOf(fillColor);
+								if (index != -1) {
+									allowedColors.splice(index, 1);
+								}
+								// Если регион не раскрашен, то добавляем его в очередь на раскраску.
+							} else if (queue.indexOf(neighbor) === -1) {
+								queue.push(neighbor);
+							}
+						});
+					}
+					// Раскрасим регион в первый доступный цвет.
+					region.options.fillColor = allowedColors[0];
+				}
+
+				for (var iso in regions) {
+					// Если регион не раскрашен, добавим его в очередь на раскраску.
+					if (!regions[iso].options.fillColor) {
+						queue.push(iso);
+					}
+					// Раскрасим все регионы из очереди.
+					while (queue.length > 0) {
+						paint(queue.shift());
+					}
+				}
+				// Добавим регионы на карту.
+				result.features = [];
+				for (var reg in regions) {
+					result.features.push(regions[reg]);
+				}
+				objectManager.add(result);
+				myMap.geoObjects.add(objectManager);
+			})
+		  //====================================================================          		  
+		          
+
+        var suggestView = new ymaps.SuggestView(
+              'address', // ID input'а
+              {
+               offset: [-2, 3], // Отступы панели подсказок от её положения по умолчанию. Задаётся в виде смещений по горизонтали и вертикали относительно левого нижнего угла элемента input.
+               width: 300, // Ширина панели подсказок
+               results: 3, // Максимальное количество показываемых подсказок.
+              });
+        }
+
+        function region_search() {
+            console.log("Region_search");
+		    
+			//Retrieve search string from the input field
+            let input_data = document.getElementById("address").value
+          
+            geo_data = ymaps.geocode(input_data, {       
+              results: 1
+            }).then(function (res) {
+                // Выбираем первый результат геокодирования.
+                var firstGeoObject = res.geoObjects.get(0),
+                // Координаты геообъекта.
+                coords = firstGeoObject.geometry.getCoordinates(),
+                // Область видимости геообъекта.
+                bounds = firstGeoObject.properties.get('boundedBy');
+
+                var administrativeArea = firstGeoObject.properties.get('metaDataProperty.GeocoderMetaData.AddressDetails.Country.AdministrativeArea.AdministrativeAreaName')
+			
+   			    firstGeoObject.options.set('preset', 'islands#darkBlueDotIconWithCaption');
+				// Получаем строку с адресом и выводим в иконке геообъекта.
+				firstGeoObject.properties.set('iconCaption', firstGeoObject.getAddressLine());
+
+				// Добавляем первый найденный геообъект на карту.
+				myMap.geoObjects.add(firstGeoObject);
+				// Масштабируем карту на область видимости геообъекта.
+				myMap.setBounds(bounds, {
+					// Проверяем наличие тайлов на данном масштабе.
+					checkZoomRange: true
+				});
+				
+				document.getElementById("subject").innerHTML = administrativeArea
+				
+			});		       
+			
+        }
+    </script>
+
+
+{% endblock %}
