@@ -30,7 +30,7 @@ class User(SqlAlchemyBase, UserMixin):
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     active = sqlalchemy.Column(sqlalchemy.CHAR, nullable=True)
     print('end')
-    events = orm.relationship("events", back_populates='user')
+    events = orm.relationship("Events", back_populates='user')
 
     def __repr__(self):
         return f'<User> {self.id} {self.name} {self.email}'
