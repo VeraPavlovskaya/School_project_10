@@ -1,17 +1,33 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, TextAreaField, SubmitField, BooleanField
+from wtforms import PasswordField, StringField, TextAreaField, SubmitField, BooleanField, RadioField
 from wtforms.fields import EmailField
 from wtforms.validators import DataRequired
 
-
 class RegisterForm(FlaskForm):
+    #email = EmailField('Почта', validators=[DataRequired()])
+    #password = PasswordField('Пароль', validators=[DataRequired()])
+    #password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
+    #name = StringField('Имя', validators=[DataRequired()])
+    #last_name = StringField('Фамилия', validators=[DataRequired()])
+    #fathers_name = StringField('Отчество') #, validators=[DataRequired()])
+    #status = StringField('Статус') #, validators=[DataRequired()])
+    #school_num = StringField('Номер учебного заведения', validators=[DataRequired()])
+    #class_num = StringField('Номер класса') #, validators=[DataRequired()])
+    #city = StringField('Город') #, validators=[DataRequired()])
+    #about = TextAreaField("Немного о себе")
+    #submit = SubmitField('Создать')
+    ###
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
-    name = StringField('Имя', validators=[DataRequired()])
+    name = StringField('Имя пользователя', validators=[DataRequired()])
     last_name = StringField('Фамилия', validators=[DataRequired()])
-    fathers_name = StringField('Отчество') #, validators=[DataRequired()])
-    status = StringField('Статус') #, validators=[DataRequired()])
+    fathers_name = StringField('Отчество')  # , validators=[DataRequired()])
+    #status = RadioField('Статус')  # , validators=[DataRequired()])
+    status = RadioField('Статус', choices=[('Учитель', 'Учитель'),
+                                           ('Ученик', 'Ученик'),
+                                           ('Родитель', 'Родитель'),
+                                           ('Другое', 'Другое')])
     school_num = StringField('Номер учебного заведения', validators=[DataRequired()])
     class_num = StringField('Номер класса') #, validators=[DataRequired()])
     city = StringField('Город') #, validators=[DataRequired()])
