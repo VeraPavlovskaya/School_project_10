@@ -193,7 +193,7 @@ def definitions():
 def contur_maps():
     return render_template("contur_maps.html", name='contur_maps')
 
-# Обязательно сделаем обработчик адреса / /Geo_Core (т.к. это главная страница):
+# Обязательно сделаем обработчик адреса / /sentinel (т.к. это главная страница):
 @app.route('/')
 @app.route('/sentinel')
 def Sentinel():
