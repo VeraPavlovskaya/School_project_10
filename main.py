@@ -18,7 +18,7 @@ app = Flask(__name__)
 # Затем сразу после создания приложения flask инициализируем LoginManager:
 login_manager = LoginManager()
 login_manager.init_app(app)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SECRET_KEY'] = 'myschoolproject_secret_key'
 
 
 # Для верной работы flask-login у нас должна быть
@@ -128,25 +128,20 @@ def reqister():
             name=form.name.data,
             email=form.email.data,
             fathers_name=form.fathers_name.data,
-            status=form.status.data,
+            #status=form.status.data,
             school_num=form.school_num.data,
             class_num=form.class_num.data,
             city=form.city.data,
             about=form.about.data,
-            hashed_password=form.hashed_password.data,
-            created_date=form.created_date.data,
-            active=form.active.data
+            #hashed_password=form.hashed_password.data,
+            #created_date=form.created_date.data,
+            #active=form.active.data
         )
         user.set_password(form.password.data)
-        print('adding user', user.name)
         db_sess.add(user)
-        print('before committing user')
         db_sess.commit()
-        print('committed')
         return redirect('/login')
-    else:
-        print('unable to validate')
-    print('returning from Register')
+    #
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -200,8 +195,8 @@ def contur_maps():
 
 # Обязательно сделаем обработчик адреса / /Geo_Core (т.к. это главная страница):
 @app.route('/')
-@app.route('/Geo_Core')
-def Geo_Core():
+@app.route('/sentinel')
+def Sentinel():
     return render_template("index.html")
 
 
