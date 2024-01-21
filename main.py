@@ -6,7 +6,7 @@ from flask_login import login_user
 from flask_login import login_required
 from flask_login import logout_user
 from flask_login import current_user
-#from forms.diagram import Diagr
+#from forms.diagram import Event
 from forms.events import EventsForm
 from forms.user import RegisterForm, LoginForm
 from data.events import Events
@@ -99,6 +99,7 @@ def edit_events(id):
     return render_template('events.html', title='Редактирование заметки', form=form)
 
 
+
 @app.route("/events")
 def events():
     db_sess = db_session.create_session()
@@ -145,6 +146,35 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
+@app.route('/profile', methods=['GET', 'POST'])
+def edit_profile():
+    form = RegisterForm()
+    db_sess = db_session.create_session()
+    print(f'current_user= {current_user}')
+    users = db_sess.query(User).filter(User.id == current_user.id).first()
+    if request.method == "GET":
+        if users:
+            form.name.data = users.name
+            form.last_name.data = users.surname
+            form.fathers_name.data = users.fathers_name
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        print('validation')
+        if users:
+            users.name = form.name.data
+            users.surname = form.last_name.data
+            users.fathers_name = form.fathers_name.data
+            db_sess.commit()
+            return redirect('/profile')
+        else:
+            abort(404)
+    else:
+        print('validation not succesful')
+    return render_template('profile_edit.html', title='Редактирование профиля', form=form)
+# def edit():
+#    return render_template("profile_edit.html", name='edit')
+
 # Сделаем обработчик адреса /login:
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -169,29 +199,29 @@ def login():
 
 
 # Сделаем обработчик адреса /Subjects:
-@app.route('/Subjects')
+@app.route('/upcoming_events')
 def subjects():
-    return render_template("subjects.html", name='subjects')
+    return render_template("upcoming_events.html", name='subjects')
 
 # Сделаем обработчик адреса /Future_works (страничка с будущими доработками):
-@app.route('/Future_works')
+@app.route('/text_admin')
 def future_works():
-    return render_template("future_works.html", name='future_works')
+    return render_template("text_admin.html", name='future_works')
 
 # Также сделаем обработчик адреса /About_me (страничка о себе):
-@app.route('/About_me')
+@app.route('/my_events')
 def about_me():
-    return render_template("about_me.html", name='about_me')
+    return render_template("my_events.html", name='about_me')
 
 # Также сделаем обработчик адреса /About_me (страничка о себе):
-@app.route('/Definitions')
+@app.route('/statistics')
 def definitions():
-    return render_template("definitions.html", name='definitions')
+    return render_template("dashboard.html", name='definitions')
 
 # Также сделаем обработчик адреса /Contur_maps (страничка с контурными картами):
-@app.route('/Contur_maps')
+@app.route('/past_events')
 def contur_maps():
-    return render_template("contur_maps.html", name='contur_maps')
+    return render_template("past_events.html", name='contur_maps')
 
 # Обязательно сделаем обработчик адреса / /sentinel (т.к. это главная страница):
 @app.route('/')
@@ -199,7 +229,9 @@ def contur_maps():
 def Sentinel():
     return render_template("index.html")
 
-
+#@app.route('/dashboard')
+#def dashboard():
+#    return render_template('dashboard.html')
 def main():
     db_session.global_init("db/blogs.db")
     app.run(port=8080, host='127.0.0.1')

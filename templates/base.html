@@ -51,7 +51,11 @@
 .dropdown:hover .dropbtn {background-color: #3e8e41;}
 </style>
 </head>
-<body style="background-color:rgb(9, 33, 154);">
+<!--<body style="background-color:rgb(9, 33, 154);">-->
+<body>
+    <div class="container">
+
+    </div>
 <header>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="#">Внеклассные мероприятия</a>
@@ -59,6 +63,7 @@
         {% if current_user.is_authenticated %}
                 {{ current_user.name }}
                 <a class="btn btn-danger" href="/logout" >Выход</a>
+                <a class="btn" href="/profile" >Профиль</a>
         {% else %}
                 <a class="btn btn-primary" href="/register">Зарегистрироваться</a>
                 <a class="btn btn-success" href="/login">Войти</a>
