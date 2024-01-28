@@ -11,15 +11,17 @@ from flask_ckeditor import CKEditor
 from forms.event import EventForm
 from forms.user import RegisterForm, LoginForm
 from forms.feedback import FeedbackForm
+from forms.statistics import StatisticsForm
 from data.events import Events
 from data.users import User
 from data.feedbacks import Feedbacks
 from data import db_session
-from werkzeug.utils import secure_filename
 import uuid as uuid
 import os
 from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
+import pandas as pd
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
@@ -30,6 +32,8 @@ model = FastTextSocialNetworkModel(tokenizer=tokenizer)
 
 USER_IMAGE_FOLDER = "static/images/users/"
 EVENT_IMAGE_FOLDER = "static/images/events/"
+GRAPHS_FOLDER = "static/images/graphs/"
+
 app.config["USER_IMAGE_FOLDER"] = USER_IMAGE_FOLDER
 app.config["EVENT_IMAGE_FOLDER"] = EVENT_IMAGE_FOLDER
 
@@ -163,6 +167,7 @@ def delete_event(id):
 ########################################################################################################################
 def get_sentiment_score(message):
     results = model.predict(message, k=2)
+    #results="1"
     print("Model predicted results: ", results)
     return str(results)
 
@@ -359,6 +364,33 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+########################################################################################################################
+## Analytics
+########################################################################################################################
+@app.route('/graphics', methods=['GET', 'POST'])
+def graphics():
+    # CONNECTION comes from db_session module
+    df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
+    y = pd.DataFrame((df["user_score"].value_counts(normalize=True) * 100))
+    plt.pie(y['proportion'], autopct='%1.1f%%', labels=y.index)
+    plot_file_name = 'feedbacks_pie.png'
+    plt.savefig(GRAPHS_FOLDER+plot_file_name)
+
+    form = StatisticsForm()
+    if form.validate_on_submit():
+        print("form.plot_type.data=", form.plot_type.data)
+        return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
+
+    return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
+
+
+
+
+########################################################################################################################
+## Other stuff
+########################################################################################################################
+
+
 # Сделаем обработчик адреса /Subjects:
 @app.route('/upcoming_events')
 def subjects():
@@ -384,9 +416,10 @@ def definitions():
 def contur_maps():
     return render_template("past_events.html", name='contur_maps')
 
+
 # Обязательно сделаем обработчик адреса / /sentinel (т.к. это главная страница):
 @app.route('/')
-@app.route('/sentinel')
+@app.route('/sentiment')
 def Sentinel():
     return render_template("index.html")
 
