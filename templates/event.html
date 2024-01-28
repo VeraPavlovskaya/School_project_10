@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for message in get_flashed_messages() %}
+	<div class="alert alert-warning alert-dismissible fade show" role="alert">
+	  {{ message }}
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+{% endfor %}
+
+<br/>
+
+<div class="shadow p-3 mb-5 bg-body rounded">
+	<h2>{{ event.title }}</h2>
+
+    {{ event.event_date_time }}
+
+    <div class="card mb-3">
+        <div class="row no-gutters">
+            <div class="col-md-2">
+                {% if event.event_picture %}
+                    <img src="{{ url_for('static', filename='images/events/' + event.event_picture)}}" width="150" align="left">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/events/default_event_picture.png')}}" width="150" align="left">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+	{{ event.description|safe }}
+    <br/><br/>
+
+    <small>Добавлено пользователем: {{ event.event_poster.name }}<br/>
+           {{ event.created_date }}
+    </small>
+
+</div>
+
+{% endblock %}

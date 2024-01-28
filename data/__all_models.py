@@ -1,4 +1,4 @@
 from . import users
 from . import events
-from . import category
+from . import categories
 from . import feedbacks
