@@ -6,10 +6,11 @@ import sqlalchemy.ext.declarative as dec
 SqlAlchemyBase = dec.declarative_base()
 
 __factory = None
-
+CONNECTION = None
 
 def global_init(db_file):
     global __factory
+    global CONNECTION
 
     if __factory:
         return
@@ -21,6 +22,8 @@ def global_init(db_file):
     print(f"Подключение к базе данных по адресу {conn_str}")
 
     engine = sa.create_engine(conn_str, echo=False)
+    CONNECTION = engine.raw_connection()
+
     __factory = orm.sessionmaker(bind=engine)
 
     from . import __all_models

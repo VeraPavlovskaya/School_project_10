@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for message in get_flashed_messages() %}
+	<div class="alert alert-success alert-dismissible fade show" role="alert">
+	  {{ message }}
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+{% endfor %}
+
+{% if current_user.is_authenticated %}
+
+	<h1>Редактирование мероприятия</h1>
+	<br/>
+
+	<div class="shadow p-3 mb-5 bg-body rounded">
+		<form action="" method="POST" enctype="multipart/form-data">
+			{{ form.hidden_tag() }}
+
+			{{ form.title.label(class="form-label") }}
+
+			{{ form.title(class="form-control") }}
+			<br/>
+
+			{{ form.event_date_time.label(class="form-label") }}
+
+			{{ form.event_date_time(class="DateTimeField") }}
+			<br/>
+
+			{{ form.event_picture(class="form-control") }}
+			<br/>
+
+			{{ form.description.label(class="form-label") }}
+
+			{{ form.description(class="form-control", rows="10") }}
+			<br/>
+
+
+			{{ form.submit(class="btn btn-primary") }}
+
+
+		</form>
+		{{ ckeditor.load() }}
+		{{ ckeditor.config(name='description') }}
+
+	</div>
+{% else %}
+	<h2> Для редактирования мероприятия необходимо войти в систему...</h2>
+	<a href="{{ url_for('login') }}">Вход в систему</a>
+{% endif %}
+
+{% endblock %}

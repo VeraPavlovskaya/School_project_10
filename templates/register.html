@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Регистрация</h1>
-<form action="" method="post">
+{% if current_user.id %}
+  <h1>Редактирование профиля</h1>
+{% else %}
+  <h1>Регистрация</h1>
+{% endif %}
+
+<form action="" method="post" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <p>
         {{ form.email.label }}<br>
@@ -13,24 +18,26 @@
             </p>
         {% endfor %}
     </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(class="form-control", type="password") }}<br>
-        {% for error in form.password.errors %}
-            <p class="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.password_again.label }}<br>
-        {{ form.password_again(class="form-control", type="password") }}<br>
-        {% for error in form.password_again.errors %}
-            <p class="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
+    {% if not current_user.id %}
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(class="form-control", type="password") }}<br>
+            {% for error in form.password.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password_again.label }}<br>
+            {{ form.password_again(class="form-control", type="password") }}<br>
+            {% for error in form.password_again.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+            {% endfor %}
+        </p>
+    {% endif %}
     <p>
         {{ form.name.label }}<br>
         {{ form.name(class="form-control") }}<br>
@@ -59,8 +66,8 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.status }}
-        {% for error in form.status.errors %}
+        {{ form.occupation }}
+        {% for error in form.occupation.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
             </p>
@@ -102,7 +109,26 @@
             </p>
         {% endfor %}
     </p>
-    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-    {{message}}
+    <p>
+        <div class="card-body media align-items-center">
+            {% if current_user.profile_picture %}
+               <img src="{{ url_for('static', filename='images/' + current_user.profile_picture)}}"
+                    width="200" height="200" >
+            {% else %}
+                <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                    width="200" height="200">
+            {% endif %}
+        </div>
+        {{ form.profile_picture.label }}<br>
+        {{ form.profile_picture(class="form-control") }}<br>
+
+    </p>
+    {% if current_user.id %}
+      <p>{{ form.save(type="submit", class="btn btn-primary") }}</p>
+    {% else %}
+      <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        {{message}}
+    {% endif %}
+
 </form>
 {% endblock %}

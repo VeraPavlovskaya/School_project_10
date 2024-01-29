@@ -1,5 +1,5 @@
 import datetime
-import sqlalchemy
+import sqlalchemy as db
 from sqlalchemy import orm
 
 from .db_session import SqlAlchemyBase
@@ -8,12 +8,15 @@ from .db_session import SqlAlchemyBase
 class Events(SqlAlchemyBase):
     __tablename__ = 'events'
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    content = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
-    is_private = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.VARCHAR, nullable=False)
+    description = db.Column(db.VARCHAR, nullable=False)
+    event_picture = db.Column(db.VARCHAR, nullable=True)
+    event_date_time = db.Column(db.DateTime, default=datetime.datetime.now)
+    created_date = db.Column(db.DateTime, default=datetime.datetime.now)
+    # Foreign key
+    poster_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
+    feedbacks = orm.relationship("Feedbacks", backref='event')
+    # Association
 
-    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
-    user = orm.relationship('User')
-    categories = orm.relationship("Category", secondary="association", backref="events")
