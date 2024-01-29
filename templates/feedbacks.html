@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for message in get_flashed_messages() %}
+	<div class="alert alert-warning alert-dismissible fade show" role="alert">
+	  {{ message }}
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+{% endfor %}
+
+</br>
+<h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
+{{ event.event_date_time }}
+</br>
+{{ event.description|safe }}
+<div class="card mb-3">
+    <div class="row no-gutters">
+        <div class="col-md-2">
+            {% if event.event_picture %}
+                <img src="{{ url_for('static', filename='images/events/' + event.event_picture)}}" width="150" align="left">
+            {% else %}
+                <img src="{{ url_for('static', filename='images/events/default_event_picture.png')}}" width="150" align="left">
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% for feedback in feedbacks %}
+	<div class="shadow p-3 mb-5 bg-body rounded">
+		{% if not feedback.is_anonymous %}
+		      Пользователь: {{ feedback.feedback_poster.name }}
+		{% else %}
+		      Пользователь: пожелал остаться неизвестным
+		{% endif %}
+
+		{{ feedback.feedback|safe }}
+
+        Оценка пользователя: {{ feedback.user_score }}
+        Оценка нейросети: {{ feedback.sentiment_score }}
+
+		{% if feedback.feedback_poster.id == current_user.id or current_user.id == 1 %}
+		<a href="{{ url_for('edit_feedback', id=feedback.id)}}" class="btn btn-outline-secondary btn-sm">Редактировать отзыв</a>
+
+		<a href="{{ url_for('delete_feedback', id=feedback.id)}}" class="btn btn-outline-danger btn-sm">Удалить отзыв</a>
+
+		{% endif %}
+
+		<br/><br/>
+	</div>
+
+	<br/>
+{% endfor %}
+
+{% endblock %}
