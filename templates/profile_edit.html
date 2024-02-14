@@ -36,7 +36,7 @@
                         <div class="tab-pane fade active show" id="account-general">
                             <div class="card-body media align-items-center">
                                 {% if current_user.profile_picture %}
-                                   <img src="{{ url_for('static', filename='images/' + current_user.profile_picture)}}"
+                                   <img src="{{ url_for('static', filename='images/users/' + current_user.profile_picture)}}"
                                         class="d-block ui-w-80"
                                         width="200" height="200" >
                                 {% else %}
