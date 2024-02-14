@@ -438,46 +438,17 @@ def graphics():
 ########################################################################################################################
 ## Other stuff
 ########################################################################################################################
-
-
-
-@app.route('/upcoming_events')
-def subjects():
-    return render_template("upcoming_events.html", name='subjects')
-
-@app.route('/text_admin')
-def future_works():
-    return render_template("text_admin.html", name='future_works')
-
-@app.route('/my_events')
-def about_me():
-    return render_template("my_events.html", name='about_me')
-
-@app.route('/statistics')
-def definitions():
-    return render_template("dashboard.html", name='definitions')
-
-@app.route('/past_events')
-def contur_maps():
-    return render_template("past_events.html", name='contur_maps')
-
-
 # Обязательно сделаем обработчик адреса / /sentiment (т.к. это главная страница):
 @app.route('/')
 @app.route('/sentiment')
 def sentiment():
     return render_template("index.html")
 
-#@app.route('/dashboard')
-#def dashboard():
-#    return render_template('dashboard.html')
+
 def main():
     db_session.global_init("db/sentiment.db")
     app.run(port=8080, host='127.0.0.1')
 
-# def home():
-#    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-#    return render_template('clock.html', current_time=current_time)
 
 if __name__ == '__main__':
     main()
