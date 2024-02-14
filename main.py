@@ -438,17 +438,21 @@ def graphics():
 ########################################################################################################################
 ## Other stuff
 ########################################################################################################################
+
+
+@app.route('/text_admin')
+def future_works():
+    return render_template("text_admin.html", name='future_works')
+
+
 # Обязательно сделаем обработчик адреса / /sentiment (т.к. это главная страница):
 @app.route('/')
 @app.route('/sentiment')
 def sentiment():
     return render_template("index.html")
-
-
 def main():
     db_session.global_init("db/sentiment.db")
     app.run(port=8080, host='127.0.0.1')
-
 
 if __name__ == '__main__':
     main()
