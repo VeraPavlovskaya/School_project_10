@@ -112,7 +112,7 @@
     <p>
         <div class="card-body media align-items-center">
             {% if current_user.profile_picture %}
-               <img src="{{ url_for('static', filename='images/' + current_user.profile_picture)}}"
+               <img src="{{ url_for('static', filename='images/users/' + current_user.profile_picture)}}"
                     width="200" height="200" >
             {% else %}
                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png"

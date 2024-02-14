@@ -34,19 +34,20 @@
 			   {{ event.created_date }}
 		</small> <br/><br/>
 
-		<a href="{{ url_for('event', id=event.id)}}" class="btn btn-outline-secondary btn-sm">Смотреть мероприятие</a>
+		<a href="{{ url_for('feedbacks', event_id=event.id)}}" class="btn btn-outline-light btn-sm">Смотреть мероприятие</a>
 
 		{% if event.poster_id == current_user.id or current_user.id == 1 %}
-		<a href="{{ url_for('edit_event', id=event.id)}}" class="btn btn-outline-secondary btn-sm">Редактировать мероприятие</a>
-
-		<a href="{{ url_for('delete_event', id=event.id)}}" class="btn btn-outline-danger btn-sm">Удалить мероприятие</a>
-
+			<a href="{{ url_for('edit_event', id=event.id)}}" class="btn btn-outline-light btn-sm">Редактировать мероприятие</a>
+			<a href="{{ url_for('delete_event', id=event.id)}}" class="btn btn-outline-light btn-sm">Удалить мероприятие</a>
 		{% endif %}
-
+		<a href="{{ url_for('add_feedback', event_id=event.id)}}" class="btn btn-outline-light btn-sm">Добавить отзыв по мероприятию</a>
 		<br/><br/>
 	</div>
 
 	<br/>
 {% endfor %}
+<br/>
+
+<a href="{{ url_for('add_event')}}" class="btn btn-info btn-sm">Создать мероприятие</a>
 
 {% endblock %}
