@@ -1,28 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+
+
+
 <table style="width:100%;" >
     <tr style="width:70%;">
-
-    <div>
-          <label for="address">Поиск события: <input type="text" id="address" style="width: 500px;"> </label>
-		  <button id="search_button" class="button process" onclick="region_search()">Найти</button> &nbsp; &nbsp;
-		  <label> Результаты вашего запроса - </label>
-		  <label id="subject"> . . . </label>
-		  <br>
-    </div>
-
     <div class="main">
     <div class="dropdown">
-        <button class="dropbtn">Dropdown</button>
-        <div class="dropdown-content">
-        <a href="{{url_for('contur_maps')}}">Прошедшие мероприятия</a>
-        <a href="{{url_for('definitions')}}">Статистика мероприятий</a>
-        <a href="{{url_for('subjects')}}">Предстоящие мероприятия</a>
-        <a href="{{url_for('events')}}">Создать мероприятие</a>
-        <a href="{{url_for('about_me')}}">Список посещённых мероприятий</a>
-        <a href="{{url_for('future_works')}}">Написать администратору</a>
-        </div>
+        <h1 class="btn">Добро пожаловать!</h1>
+        <a href="{{url_for('graphics')}}">
+            <div class="alert alert-info" role="alert">
+                Статистика мероприятий
+            </div>
+        </a>
+        <a href="{{url_for('events')}}">
+            <div class="alert alert-danger" role="alert">
+                Список мероприятий
+            </div>
+        </a>
+        <a href="{{url_for('future_works')}}">
+            <div class="alert alert-warning" role="alert">
+                Написать администратору
+            </div>
+        </a>
+
     </div>
     </div>
 

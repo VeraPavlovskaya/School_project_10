@@ -5,7 +5,12 @@
 <h1>Профиль</h1>
     <center>
         <div class="box">
-            <img src="static/My_pic.jpg">
+            {% if current_user.profile_picture %}
+                <img src="static/My_pic.jpg">
+            {% else %}
+                <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                                        class="d-block ui-w-80"
+                                        width="200" height="200">
             <input type="file" name="" id="file" accept="image/*">
             <label for="file">Edit pic</label>
             <input type="text" name="" placeholder="Name">
