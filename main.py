@@ -263,7 +263,7 @@ def delete_feedback(id):
     db_sess = db_session.create_session()
     feedback = db_sess.query(Feedbacks).filter(Feedbacks.id == id).first()
     event = db_sess.query(Events).filter(Events.id == feedback.event_id).first()
-    if id == feedback.poster_id or current_user.id == 1:
+    if current_user.id == feedback.poster_id or current_user.id == 1:
         try:
             db_sess.delete(feedback)
             db_sess.commit()
