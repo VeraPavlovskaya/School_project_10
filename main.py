@@ -181,9 +181,12 @@ def delete_event(id):
 def get_sentiment_score(message):
     results = model.predict(message, k=2)
     #results="1"
-    print("testing message: ", message)
-    print("Model predicted results: ", results)
-    return str(results)
+    res = ''
+    for m, sentiment in zip(message, results):
+        print(message, '->', sentiment)
+        res = sentiment
+        break
+    return str(res)
 
 
 # Обработчик страницы отзывов для мероприятия с заданным id
