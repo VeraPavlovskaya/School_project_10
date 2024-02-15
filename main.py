@@ -22,12 +22,11 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import logging
+import json
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
-
-tokenizer = RegexTokenizer()
-model = FastTextSocialNetworkModel(tokenizer=tokenizer)
 
 # Глобальные переменные. Путь к картинкам
 USER_IMAGE_FOLDER = "static/images/users/"
@@ -40,6 +39,8 @@ app.config["EVENT_IMAGE_FOLDER"] = EVENT_IMAGE_FOLDER
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'myschoolproject_secret_key'
+
+logging.basicConfig(filename='app.log', level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
 
 
 # Для верной работы flask-login у нас должна быть
@@ -179,14 +180,40 @@ def delete_event(id):
 ########################################################################################################################
 # Определение тональности отзыва при помощи библиотеки Dostoevsky
 def get_sentiment_score(message):
-    results = model.predict(message, k=2)
-    #results="1"
-    res = ''
-    for m, sentiment in zip(message, results):
-        print(message, '->', sentiment)
-        res = sentiment
-        break
-    return str(res)
+    log("testing message: "+message)
+
+    tokenizer = RegexTokenizer()
+    model = FastTextSocialNetworkModel(tokenizer=tokenizer)
+
+    msg_list = list()
+    msg_list.append(message)
+    results = model.predict(msg_list, k=2)
+    log('predicted_result:' + str(results[0]))
+
+    translated_result = sentiment_to_text(str(results[0]))
+    log('translated_result:'+translated_result)
+
+    return translated_result
+
+def sentiment_to_text(sentiment_str):
+    translation = {'positive': 'позитивный',
+                   'neutral': 'нейтральный',
+                   'negative': 'негативный',
+                   'skip': 'неопределенный',
+                   'speech': 'другой'}
+    sentiment_dict = json.loads(sentiment_str.replace("'",'"'))
+    msg = ""
+    for key, val in sentiment_dict.items():
+        if key in translation:
+            ru_key = translation[key]
+        else:
+            ru_key = key
+        val_rnd = round(val, 5)
+        val_rnd = round(val * 100, 2)
+        msg += f"{str(val_rnd)}% - {ru_key}, "
+    msg = msg[:-2]
+
+    return msg
 
 
 # Обработчик страницы отзывов для мероприятия с заданным id
@@ -197,7 +224,7 @@ def feedbacks(event_id):
     event = db_sess.query(Events).filter(Events.id == event_id).first()
     # Выбираем отзывы по мероприятию из БД
     feedbacks = db_sess.query(Feedbacks).filter(Feedbacks.event_id == event_id).order_by(Feedbacks.created_date)
-    print("*** event.id =", event.id)
+    #print("*** event.id =", event.id)
     return render_template('feedbacks.html', event=event, feedbacks = feedbacks)
 
 
@@ -210,9 +237,8 @@ def add_feedback(event_id):
     # Обработка метода POST
     if form.validate_on_submit():
         txt = form.feedback.data
-        txt = txt.replace('<p>', '').replace('</p>', '')
+        #txt = txt.replace('<p>', '').replace('</p>', '')
         feedback_score = get_sentiment_score(txt)
-        print('creating feedback. sentiment_score is', feedback_score)
         feedback = Feedbacks(feedback=form.feedback.data,
                        user_score=form.user_score.data,
                        sentiment_score=feedback_score,
@@ -239,9 +265,9 @@ def edit_feedback(id):
     if form.validate_on_submit():
         feedback.feedback = form.feedback.data
         feedback.user_score=form.user_score.data
+        # Вызов функции нейросети для оценки тональности
         feedback_score = get_sentiment_score(form.feedback.data)
-
-        print(f'feedback_score_edit_feedback: {feedback_score}')
+        #
         feedback.sentiment_score=feedback_score
         feedback.is_anonymous=form.is_anonymous.data
         db_sess.add(feedback)
@@ -266,7 +292,7 @@ def delete_feedback(id):
     db_sess = db_session.create_session()
     feedback = db_sess.query(Feedbacks).filter(Feedbacks.id == id).first()
     event = db_sess.query(Events).filter(Events.id == feedback.event_id).first()
-    if current_user.id == feedback.poster_id or current_user.id == 1:
+    if id == feedback.poster_id or current_user.id == 1:
         try:
             db_sess.delete(feedback)
             db_sess.commit()
@@ -326,7 +352,7 @@ def reqister():
 def edit_profile():
     form = RegisterForm()
     db_sess = db_session.create_session()
-    print(f'current_user= {current_user}')
+    log(f'current_user= {current_user}')
     user = db_sess.query(User).filter(User.id == current_user.id).first()
     #
     if request.method == "GET":
@@ -346,7 +372,6 @@ def edit_profile():
             abort(404)
     #
     if form.validate_on_submit():
-        print('validated profile edit form')
         if user:
             user.email = form.email.data
             user.name = form.name.data
@@ -368,8 +393,8 @@ def edit_profile():
         else:
             abort(404)
     else:
-        print('validation not succesful')
-        print(form.errors)
+        #print('validation not succesful')
+        log(form.errors)
     return render_template('register.html', title='Редактирование профиля', form=form)
 # def edit():
 #    return render_template("profile_edit.html", name='edit')
@@ -428,21 +453,24 @@ def graphics():
             plt.hist(y['user_score'])
             plot_file_name = 'feedbacks_hist.png'
             plt.savefig(GRAPHS_FOLDER + plot_file_name)
-        print("form.plot_type.data=", form.plot_type.data)
-        print("plot_file_name=", plot_file_name)
+        log("form.plot_type.data="+form.plot_type.data)
+        log("plot_file_name="+plot_file_name)
         return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
-    print("statistincs.get")
 
     return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
-
-
 
 
 ########################################################################################################################
 ## Other stuff
 ########################################################################################################################
+def log(message, level='INFO'):
+    if level == 'INFO':
+        app.logger.info(message)
+    elif level == 'ERROR':
+        app.logger.exception(message)
 
 
+# Сделаем обработчик адреса /Future_works (страничка с будущими доработками):
 @app.route('/text_admin')
 def future_works():
     return render_template("text_admin.html", name='future_works')
@@ -453,9 +481,22 @@ def future_works():
 @app.route('/sentiment')
 def sentiment():
     return render_template("index.html")
+
+@app.errorhandler(500)
+def server_error(error):
+    app.logger.exception('An exception occurred during a request.')
+    return 'Internal Server Error', 500
+
+
 def main():
-    db_session.global_init("db/sentiment.db")
-    app.run(port=8080, host='127.0.0.1')
+    try:
+        log('Starting main app')
+        db_session.global_init("db/sentiment.db")
+        #app.run(port=8080, host='127.0.0.1')
+        app.run()
+    except Exception as E:
+        log('Starting main app failed: '+str(E), 'ERROR')
+        return 'Internal Error Occurred'
 
 if __name__ == '__main__':
     main()
