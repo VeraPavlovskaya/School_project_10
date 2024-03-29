@@ -77,9 +77,9 @@
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="/">Внеклассные мероприятия</a>
         <!-- Search bar form -->
-        <form method="post" action="{{ url_for('search') }}">
+        <form method="post" action="{{ url_for('events') }}">
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Введите текст мероприятия" name="searched">
+                <input type="text" class="form-control" placeholder="Поиск мероприятий" name="searched">
                 <div class="input-group-append">
                     <button class="btn btn-danger" type="submit">Найти</button>
                 </div>

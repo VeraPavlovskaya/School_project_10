@@ -25,6 +25,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import logging
 import json
+from sqlalchemy import func, or_
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
@@ -42,7 +43,6 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'myschoolproject_secret_key'
 
 logging.basicConfig(filename='app.log', level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
-
 
 # Для верной работы flask-login у нас должна быть
 # функция load_user для получения пользователя
@@ -66,15 +66,29 @@ def logout():
 ########################################################################################################################
 
 # Переход на страницу со списком мероприятий
-@app.route('/events')
+@app.route('/events', methods=['GET', 'POST'])
 def events():
     db_sess = db_session.create_session()
     # Выберем все мероприятия из БД
-    form = SearchForm()
-    if form.validate_on_submit():
+    srch_txt = "%{}%".format(request.form['searched'])
+    srch_txt_cml = "%{}%".format(request.form['searched'].capitalize())
+    srch_txt_upr = "%{}%".format(request.form['searched'].upper())
+    #form = SearchForm()
+    #if form.validate_on_submit():
         # event.searched = form.searched.data
-        events = db_sess.query(Events).filter(form.searched.data).first()
-    events = db_sess.query(Events).order_by(Events.event_date_time)
+    #    events = db_sess.query(Events).filter(form.searched.data).first()
+    print('searched_text=', srch_txt)
+    print('searched_text_lower=', srch_txt_cml)
+    events = db_sess.query(Events).filter(
+                or_(Events.title.ilike(srch_txt),
+                    Events.description.ilike(srch_txt),
+                    Events.title.ilike(srch_txt_cml),
+                    Events.description.ilike(srch_txt_cml),
+                    Events.title.ilike(srch_txt_upr),
+                    Events.description.ilike(srch_txt_upr)
+                    )
+                ).order_by(Events.event_date_time)
+
     return render_template('events.html', events=events)
 
 
@@ -99,6 +113,8 @@ def add_event():
             pic_filename = 'evt_' + str(uuid.uuid1()) + '.pic'
             event_pic = request.files['event_picture']
             event_pic.save(os.path.join(app.config["EVENT_IMAGE_FOLDER"], pic_filename))
+        else:
+            pic_filename = "default_event.pic"
         # Сформируем объект мероприятия для добавления в БД из данных формы
         event = Events(title=form.title.data,
                        description=form.description.data,
@@ -497,6 +513,7 @@ def sentiment():
     if request.method == 'POST':
         if 'toggle_music' in request.form:
             music_playing = not music_playing
+
     return render_template("index.html")
 
 
