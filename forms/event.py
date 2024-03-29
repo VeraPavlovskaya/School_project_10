@@ -11,3 +11,8 @@ class EventForm(FlaskForm):
     event_picture = FileField("Фото")
     event_date_time = DateTimeField("Дата и время мероприятия", validators=[DataRequired()])
     submit = SubmitField('Сохранить')
+
+# Create a search form
+class SearchForm(FlaskForm):
+    searched = StringField('Searched', validators=[DataRequired()])
+    submit = SubmitField('Сохранить')

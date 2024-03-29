@@ -56,9 +56,35 @@
     <div class="container">
 
     </div>
+    <div id="music-container">
+        {% if music_playing %}
+            <audio id="music" loop autoplay>
+                <source src="{{ url_for('static', filename='musicfox.mp3') }}" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
+        {% endif %}
+        <form method="post" action="/">
+            <button type="submit" name="toggle_music">
+                {% if music_playing %}
+                    Turn Off Music
+                {% else %}
+                    Turn On Music
+                {% endif %}
+            </button>
+        </form>
+    </div>
 <header>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="/">Внеклассные мероприятия</a>
+        <!-- Search bar form -->
+        <form method="post" action="{{ url_for('search') }}">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Введите текст мероприятия" name="searched">
+                <div class="input-group-append">
+                    <button class="btn btn-danger" type="submit">Найти</button>
+                </div>
+            </div>
+        </form>
         <div class="navbar-brand">
         {% if current_user.is_authenticated %}
                 {{ current_user.name }}
