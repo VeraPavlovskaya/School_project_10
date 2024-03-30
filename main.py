@@ -1,3 +1,4 @@
+#2024-03-29_1
 from flask import Flask, url_for, render_template, redirect, request, abort, flash
 # Импортируем нужные классы:
 from flask_login import LoginManager
@@ -20,11 +21,12 @@ from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
 import pandas as pd
 import matplotlib
-
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import logging
 import json
+import traceback
+from werkzeug.exceptions import HTTPException
 from sqlalchemy import func, or_
 
 app = Flask(__name__)
@@ -41,8 +43,10 @@ app.config["EVENT_IMAGE_FOLDER"] = EVENT_IMAGE_FOLDER
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'myschoolproject_secret_key'
+app.config['DEBUG'] = True
 
-logging.basicConfig(filename='app.log', level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
+#logging.basicConfig(filename='./app.log', level=logging.INFO, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
+
 
 # Для верной работы flask-login у нас должна быть
 # функция load_user для получения пользователя
@@ -51,7 +55,6 @@ logging.basicConfig(filename='app.log', level=logging.DEBUG, format=f'%(asctime)
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
-
 
 # Обработчик адреса logout
 @app.route('/logout')
@@ -68,27 +71,38 @@ def logout():
 # Переход на страницу со списком мероприятий
 @app.route('/events', methods=['GET', 'POST'])
 def events():
-    db_sess = db_session.create_session()
-    # Выберем все мероприятия из БД
-    srch_txt = "%{}%".format(request.form['searched'])
-    srch_txt_cml = "%{}%".format(request.form['searched'].capitalize())
-    srch_txt_upr = "%{}%".format(request.form['searched'].upper())
-    #form = SearchForm()
-    #if form.validate_on_submit():
-        # event.searched = form.searched.data
-    #    events = db_sess.query(Events).filter(form.searched.data).first()
-    print('searched_text=', srch_txt)
-    print('searched_text_lower=', srch_txt_cml)
-    events = db_sess.query(Events).filter(
-                or_(Events.title.ilike(srch_txt),
-                    Events.description.ilike(srch_txt),
-                    Events.title.ilike(srch_txt_cml),
-                    Events.description.ilike(srch_txt_cml),
-                    Events.title.ilike(srch_txt_upr),
-                    Events.description.ilike(srch_txt_upr)
-                    )
-                ).order_by(Events.event_date_time)
+    log("Rendering Events page")
+    try:
+        db_sess = db_session.create_session()
+        log("created DB session")
 
+        # Выберем все мероприятия из БД
+        if request.method == "POST":
+            srch_txt = "%{}%".format(request.form['searched'])
+            srch_txt_cml = "%{}%".format(request.form['searched'].capitalize())
+            srch_txt_upr = "%{}%".format(request.form['searched'].upper())
+        else:
+            srch_txt = srch_txt_cml = srch_txt_upr = "%"
+        #form = SearchForm()
+        #if form.validate_on_submit():
+            # event.searched = form.searched.data
+        #    events = db_sess.query(Events).filter(form.searched.data).first()
+        print('searched_text=', srch_txt)
+        print('searched_text_lower=', srch_txt_cml)
+        events = db_sess.query(Events).filter(
+                    or_(Events.title.ilike(srch_txt),
+                        Events.description.ilike(srch_txt),
+                        Events.title.ilike(srch_txt_cml),
+                        Events.description.ilike(srch_txt_cml),
+                        Events.title.ilike(srch_txt_upr),
+                        Events.description.ilike(srch_txt_upr)
+                        )
+                    ).order_by(Events.event_date_time)
+    except Exception as e:
+        with open('error_events.log', 'a') as f:
+            traceback.print_exc(file=f)
+        log("Error rendering events:"+str(e))
+        return str(e)
     return render_template('events.html', events=events)
 
 
@@ -456,6 +470,7 @@ def login():
 @app.route('/graphics', methods=['GET', 'POST'])
 def graphics():
     # CONNECTION comes from db_session module
+    plt.clf()
     df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
     y = pd.DataFrame((df["user_score"].value_counts(normalize=True) * 100))
     plt.pie(y['proportion'], autopct='%1.1f%%', labels=y.index)
@@ -508,6 +523,10 @@ def future_works():
 @app.route('/')
 @app.route('/sentiment')
 def sentiment():
+    log("rendering main page")
+    db_session.global_init("db/sentiment.db")
+    log("Initialized DB")
+
     music_playing = False
 
     if request.method == 'POST':
@@ -542,7 +561,7 @@ def search():
 def main():
     try:
         log('Starting main app')
-        db_session.global_init("db/sentiment.db")
+        #db_session.global_init("db/sentiment.db")
         # app.run(port=8080, host='127.0.0.1')
         app.run()
     except Exception as E:

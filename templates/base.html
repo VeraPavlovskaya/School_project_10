@@ -56,23 +56,7 @@
     <div class="container">
 
     </div>
-    <div id="music-container">
-        {% if music_playing %}
-            <audio id="music" loop autoplay>
-                <source src="{{ url_for('static', filename='musicfox.mp3') }}" type="audio/mp3">
-                Your browser does not support the audio element.
-            </audio>
-        {% endif %}
-        <form method="post" action="/">
-            <button type="submit" name="toggle_music">
-                {% if music_playing %}
-                    Turn Off Music
-                {% else %}
-                    Turn On Music
-                {% endif %}
-            </button>
-        </form>
-    </div>
+
 <header>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="/">Внеклассные мероприятия</a>
