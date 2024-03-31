@@ -14,5 +14,5 @@ class EventForm(FlaskForm):
 
 # Create a search form
 class SearchForm(FlaskForm):
-    searched = StringField('Searched', validators=[DataRequired()])
-    submit = SubmitField('Сохранить')
+    searched = StringField('Поиск мероприятий')
+    submit = SubmitField('Найти')
