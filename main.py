@@ -1,5 +1,5 @@
 #2024-03-29_1
-from flask import Flask, url_for, render_template, redirect, request, abort, flash
+from flask import Flask, url_for, render_template, redirect, request, abort, flash, jsonify
 # Импортируем нужные классы:
 from flask_login import LoginManager
 from flask_login import login_user
@@ -506,6 +506,30 @@ def graphics():
 ########################################################################################################################
 ## Other stuff
 ########################################################################################################################
+@app.route('/events/add', methods=['GET', 'POST'])
+def add_message():
+    form = EventForm()
+    db_sess = db_session.create_session()
+    # Обработка метода POST
+    if form.validate_on_submit():
+        # Сформируем объект мероприятия для добавления в БД из данных формы
+        event = Events(title=form.title.data,
+                       description=form.description.data,
+                       event_date_time=form.event_date_time.data,
+                       poster_id=current_user.id)
+        # Очистим поля формы
+        form.title.data = ''
+        form.description.data = ''
+        form.event_date_time.data = ''
+        # form.event_picture = ''
+        # Сохраним запись в БД
+        db_sess.add(event)
+        db_sess.commit()
+
+        flash("Новое письмо отправлено успешно, ожидайте ответа администратора")
+    # Обработчик метода GET
+    return render_template("add_event.html", form=form)
+
 def log(message, level='INFO'):
     if level == 'INFO':
         app.logger.info(message)
@@ -527,13 +551,20 @@ def sentiment():
     db_session.global_init("db/sentiment.db")
     log("Initialized DB")
 
-    music_playing = False
+    #   music_playing = False
 
-    if request.method == 'POST':
-        if 'toggle_music' in request.form:
-            music_playing = not music_playing
+    #    if request.method == 'POST':
+    #       if 'toggle_music' in request.form:
+    #          music_playing = not music_playing
 
     return render_template("index.html")
+
+
+@app.route('/toggle_music', methods=['POST'])
+def toggle_music():
+    global music_on
+    music_on = not music_on
+    return jsonify({'music_on': music_on})
 
 
 @app.errorhandler(500)

@@ -2,8 +2,50 @@
 
 {% block content %}
     <h1> Написать администратору</h1>
-<h2> В доработке...</h2>
-    <div class="go_to_homepage">
-        <a class="go_to_homepage" href="{{url_for('sentiment')}}"> Перейти на главную</a>
-    </div>
+<!--{% for message in get_flashed_messages() %}
+	<div class="alert alert-warning alert-dismissible fade show" role="alert">
+	  {{ message }}
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+{% endfor %}
+
+</br>
+
+{% for event in events %}
+	<div class="shadow p-3 mb-5 bg-body rounded">
+		<h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
+		{{ event.event_date_time }}
+		</br>
+		{{ event.description|safe }}
+
+		<div class="card mb-3">
+			<div class="row no-gutters">
+				<div class="col-md-2">
+					{% if event.event_picture %}
+						<img src="{{ url_for('static', filename='images/events/' + event.event_picture)}}" width="150" align="left">
+					{% else %}
+						<img src="{{ url_for('static', filename='images/events/default_event_picture.png')}}" width="150" align="left">
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		<small>Добавлено пользователем: {{ event.event_poster.name }}<br/>
+			   {{ event.created_date }}
+		</small> <br/><br/>
+
+		<a href="{{ url_for('feedbacks', event_id=event.id)}}" class="btn btn-outline-light btn-sm">Открыть письма</a>
+
+		{% if event.poster_id == current_user.id or current_user.id == 1 %}
+			<a href="{{ url_for('edit_event', id=event.id)}}" class="btn btn-outline-light btn-sm">Редактировать письмо</a>
+			<a href="{{ url_for('delete_event', id=event.id)}}" class="btn btn-outline-light btn-sm">Удалить письмо</a>
+		{% endif %}
+		<br/><br/>
+	</div>
+
+	<br/>
+{% endfor %}
+<br/>-->
+
+<a href="{{ url_for('add_message')}}" class="btn btn-info btn-sm">Написать письмо</a>
 {% endblock %}
