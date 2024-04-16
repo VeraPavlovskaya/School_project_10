@@ -1,6 +1,7 @@
-#2024-03-29_1
+# 2024-03-29_1
 from flask import Flask, url_for, render_template, redirect, request, abort, flash, jsonify
 # Импортируем нужные классы:
+from forms.text_admin import MessageForm
 from flask_login import LoginManager
 from flask_login import login_user
 from flask_login import login_required
@@ -12,6 +13,7 @@ from forms.user import RegisterForm, LoginForm
 from forms.feedback import FeedbackForm
 from forms.statistics import StatisticsForm
 from data.events import Events
+from data.messages import Messages
 from data.users import User
 from data.feedbacks import Feedbacks
 from data import db_session
@@ -21,6 +23,7 @@ from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
 import pandas as pd
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import logging
@@ -45,7 +48,8 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'myschoolproject_secret_key'
 app.config['DEBUG'] = True
 
-#logging.basicConfig(filename='./app.log', level=logging.INFO, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
+
+# logging.basicConfig(filename='./app.log', level=logging.INFO, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
 
 
 # Для верной работы flask-login у нас должна быть
@@ -55,6 +59,7 @@ app.config['DEBUG'] = True
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
 
 # Обработчик адреса logout
 @app.route('/logout')
@@ -83,25 +88,25 @@ def events():
             srch_txt_upr = "%{}%".format(request.form['searched'].upper())
         else:
             srch_txt = srch_txt_cml = srch_txt_upr = "%"
-        #form = SearchForm()
-        #if form.validate_on_submit():
-            # event.searched = form.searched.data
+        # form = SearchForm()
+        # if form.validate_on_submit():
+        # event.searched = form.searched.data
         #    events = db_sess.query(Events).filter(form.searched.data).first()
         print('searched_text=', srch_txt)
         print('searched_text_lower=', srch_txt_cml)
         events = db_sess.query(Events).filter(
-                    or_(Events.title.ilike(srch_txt),
-                        Events.description.ilike(srch_txt),
-                        Events.title.ilike(srch_txt_cml),
-                        Events.description.ilike(srch_txt_cml),
-                        Events.title.ilike(srch_txt_upr),
-                        Events.description.ilike(srch_txt_upr)
-                        )
-                    ).order_by(Events.event_date_time)
+            or_(Events.title.ilike(srch_txt),
+                Events.description.ilike(srch_txt),
+                Events.title.ilike(srch_txt_cml),
+                Events.description.ilike(srch_txt_cml),
+                Events.title.ilike(srch_txt_upr),
+                Events.description.ilike(srch_txt_upr)
+                )
+        ).order_by(Events.event_date_time)
     except Exception as e:
         with open('error_events.log', 'a') as f:
             traceback.print_exc(file=f)
-        log("Error rendering events:"+str(e))
+        log("Error rendering events:" + str(e))
         return str(e)
     return render_template('events.html', events=events)
 
@@ -506,7 +511,7 @@ def graphics():
 ########################################################################################################################
 ## Other stuff
 ########################################################################################################################
-@app.route('/events/add', methods=['GET', 'POST'])
+'''@app.route('/events/add', methods=['GET', 'POST'])
 def add_message():
     form = EventForm()
     db_sess = db_session.create_session()
@@ -529,6 +534,8 @@ def add_message():
         flash("Новое письмо отправлено успешно, ожидайте ответа администратора")
     # Обработчик метода GET
     return render_template("add_event.html", form=form)
+'''
+
 
 def log(message, level='INFO'):
     if level == 'INFO':
@@ -538,9 +545,30 @@ def log(message, level='INFO'):
 
 
 # Сделаем обработчик адреса /Future_works (страничка с будущими доработками):
-@app.route('/text_admin')
-def future_works():
-    return render_template("text_admin.html", name='future_works')
+#@app.route('/text_admin')
+#def future_works():
+ #   return render_template("add_message.html", name='future_works')
+
+
+@app.route('/send_message', methods=['GET', 'POST'])
+@login_required
+def send_message():
+    form = MessageForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        message = Messages(
+            subject=form.subject.data,
+            text=form.text.data,
+            user_id=current_user.id)
+        # Очистим поля формы
+        form.subject.data = ''
+        form.text.data = ''
+        # Сохраним запись в БД
+        db_sess.add(message)
+        db_sess.commit()
+        flash('Сообщение успешно отправлено.')
+        return render_template('add_message.html', form=form)
+    return render_template("add_message.html", form=form)
 
 
 # Обязательно сделаем обработчик адреса / /sentiment (т.к. это главная страница):
@@ -592,7 +620,7 @@ def search():
 def main():
     try:
         log('Starting main app')
-        #db_session.global_init("db/sentiment.db")
+        # db_session.global_init("db/sentiment.db")
         # app.run(port=8080, host='127.0.0.1')
         app.run()
     except Exception as E:
