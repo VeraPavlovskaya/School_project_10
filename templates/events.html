@@ -12,7 +12,7 @@
 </br>
 
 {% for event in events %}
-	<div class="shadow p-3 mb-5 bg-body rounded">
+	<div class="shadow p-3 mb-5 bg-body rounded" style="color: white;">
 		<h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
 		{{ event.event_date_time }}
 		</br>

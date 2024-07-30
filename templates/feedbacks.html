@@ -8,26 +8,27 @@
 	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	</div>
 {% endfor %}
-
-</br>
-<h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
-{{ event.event_date_time }}
-</br>
-{{ event.description|safe }}
+<div style="color: white;">
+	</br>
+	<h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
+	{{ event.event_date_time }}
+	</br>
+	{{ event.description|safe }}
+</div>
 <div class="card mb-3">
     <div class="row no-gutters">
         <div class="col-md-2">
             {% if event.event_picture %}
                 <img src="{{ url_for('static', filename='images/events/' + event.event_picture)}}" width="150" align="left">
             {% else %}
-                <img src="{{ url_for('static', filename='images/events/default_event_picture.png')}}" width="150" align="left">
+                <img src="{{ url_for('static', filename='images/events/default_event_picture.png')}}" width="15	0" align="left">
             {% endif %}
         </div>
     </div>
 </div>
 
 {% for feedback in feedbacks %}
-	<div class="shadow p-3 mb-5 bg-body rounded">
+	<div class="shadow p-3 mb-5 bg-body rounded" style="color: white;">
 		{% if not feedback.is_anonymous %}
 		      Пользователь: {{ feedback.feedback_poster.name }}
 		{% else %}

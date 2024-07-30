@@ -11,17 +11,18 @@
 
 {% if current_user.is_authenticated %}
 
-	<h1>Редактировать отзыв</h1>
+	<h1 style="color: white;">Редактировать отзыв</h1>
 	<br/>
 </br>
 <h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
-{{ event.event_date_time }}
-</br>
-{{ event.description|safe }}
-</br>
-
+<div style="color: white;">
+	{{ event.event_date_time }}
+	</br>
+	{{ event.description|safe }}
+	</br>
+</div>
 	<div class="shadow p-3 mb-5 bg-body rounded">
-		<form action="" method="POST">
+		<form action="" method="POST" style="color: white;">
 			{{ form.hidden_tag() }}
 
 			{{ form.feedback.label(class="form-label") }}
