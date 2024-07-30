@@ -15,17 +15,17 @@
 	</br>
 	{{ event.description|safe }}
 </div>
-<div class="card mb-3">
+<!--<div class="card mb-3"> -->
     <div class="row no-gutters">
         <div class="col-md-2">
             {% if event.event_picture %}
                 <img src="{{ url_for('static', filename='images/events/' + event.event_picture)}}" width="150" align="left">
             {% else %}
-                <img src="{{ url_for('static', filename='images/events/default_event_picture.png')}}" width="15	0" align="left">
+                <img src="{{ url_for('static', filename='images/events/default_event_picture.png')}}" width="150" align="left">
             {% endif %}
         </div>
     </div>
-</div>
+<!--</div> -->
 
 {% for feedback in feedbacks %}
 	<div class="shadow p-3 mb-5 bg-body rounded" style="color: white;">

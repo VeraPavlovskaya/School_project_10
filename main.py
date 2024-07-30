@@ -23,7 +23,6 @@ from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
 import pandas as pd
 import matplotlib
-
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import logging
@@ -60,7 +59,6 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
-
 # Обработчик адреса logout
 @app.route('/logout')
 @login_required
@@ -95,14 +93,14 @@ def events():
         print('searched_text=', srch_txt)
         print('searched_text_lower=', srch_txt_cml)
         events = db_sess.query(Events).filter(
-            or_(Events.title.ilike(srch_txt),
-                Events.description.ilike(srch_txt),
-                Events.title.ilike(srch_txt_cml),
-                Events.description.ilike(srch_txt_cml),
-                Events.title.ilike(srch_txt_upr),
-                Events.description.ilike(srch_txt_upr)
-                )
-        ).order_by(Events.event_date_time)
+                    or_(Events.title.ilike(srch_txt),
+                        Events.description.ilike(srch_txt),
+                        Events.title.ilike(srch_txt_cml),
+                        Events.description.ilike(srch_txt_cml),
+                        Events.title.ilike(srch_txt_upr),
+                        Events.description.ilike(srch_txt_upr)
+                        )
+                    ).order_by(Events.event_date_time)
     except Exception as e:
         with open('error_events.log', 'a') as f:
             traceback.print_exc(file=f)
@@ -536,9 +534,6 @@ def graphics():
 ########################################################################################################################
 ## Other stuff
 ########################################################################################################################
-
-
-
 def log(message, level='INFO'):
     if level == 'INFO':
         app.logger.info(message)
@@ -546,7 +541,13 @@ def log(message, level='INFO'):
         app.logger.exception(message)
 
 
+# Сделаем обработчик адреса /Future_works (страничка с будущими доработками):
+#@app.route('/text_admin')
+#def future_works():
+#    return render_template("text_admin.html", name='future_works')
+
 @app.route('/send_message', methods=['GET', 'POST'])
+#@login_required
 def send_message():
     form = MessageForm()
     if form.validate_on_submit():
@@ -576,13 +577,6 @@ def sentiment():
 
 
     return render_template("index.html")
-
-
-@app.route('/toggle_music', methods=['POST'])
-def toggle_music():
-    global music_on
-    music_on = not music_on
-    return jsonify({'music_on': music_on})
 
 
 @app.errorhandler(500)
