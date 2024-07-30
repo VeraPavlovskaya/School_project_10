@@ -1,5 +1,5 @@
-#2024-03-29_1
-from flask import Flask, url_for, render_template, redirect, request, abort, flash
+# 2024-03-29_1
+from flask import Flask, url_for, render_template, redirect, request, abort, flash, jsonify
 # Импортируем нужные классы:
 from forms.text_admin import MessageForm
 from flask_login import LoginManager
@@ -47,7 +47,8 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'myschoolproject_secret_key'
 app.config['DEBUG'] = True
 
-#logging.basicConfig(filename='./app.log', level=logging.INFO, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
+
+# logging.basicConfig(filename='./app.log', level=logging.INFO, format=f'%(asctime)s %(levelname)s %(name)s : %(message)s')
 
 
 # Для верной работы flask-login у нас должна быть
@@ -85,9 +86,9 @@ def events():
             srch_txt_upr = "%{}%".format(request.form['searched'].upper())
         else:
             srch_txt = srch_txt_cml = srch_txt_upr = "%"
-        #form = SearchForm()
-        #if form.validate_on_submit():
-            # event.searched = form.searched.data
+        # form = SearchForm()
+        # if form.validate_on_submit():
+        # event.searched = form.searched.data
         #    events = db_sess.query(Events).filter(form.searched.data).first()
         print('searched_text=', srch_txt)
         print('searched_text_lower=', srch_txt_cml)
@@ -494,12 +495,37 @@ def graphics():
         elif form.plot_type.data == "2":
             plt.clf()
             df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
-            y = pd.DataFrame((df["user_score"]))
-            plt.hist(y['user_score'])
+            y = df["user_score"]
+            plt.hist(y, bins=10, edgecolor='black')
             plot_file_name = 'feedbacks_hist.png'
             plt.savefig(GRAPHS_FOLDER + plot_file_name)
-        log("form.plot_type.data=" + form.plot_type.data)
-        log("plot_file_name=" + plot_file_name)
+        # Ящик с усами
+        elif form.plot_type.data == "3":
+            plt.clf()
+            df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
+            y = df["user_score"]
+
+            # Преобразование данных в числовой тип и удаление NaN значений
+            y = pd.to_numeric(y, errors='coerce')
+            y = y.dropna()
+
+            plt.boxplot(y)
+            plot_file_name = 'feedbacks_boxplot.png'
+            plt.savefig(GRAPHS_FOLDER + plot_file_name)
+            log("form.plot_type.data=" + form.plot_type.data)
+            log("plot_file_name=" + plot_file_name)
+        # График рассеяния
+        elif form.plot_type.data == "4":
+            plt.clf()
+            df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
+            print(df.columns)  # Вывод названий столбцов для отладки
+            y = df["user_score"]
+
+            plt.scatter(range(len(y)), y)
+            plot_file_name = 'feedbacks_scatter.png'
+            plt.savefig(GRAPHS_FOLDER + plot_file_name)
+            log("form.plot_type.data=" + form.plot_type.data)
+            log("plot_file_name=" + plot_file_name)
         return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
 
     return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
@@ -549,11 +575,6 @@ def sentiment():
     db_session.global_init("db/sentiment.db")
     log("Initialized DB")
 
-    music_playing = False
-
-    if request.method == 'POST':
-        if 'toggle_music' in request.form:
-            music_playing = not music_playing
 
     return render_template("index.html")
 
@@ -583,7 +604,7 @@ def search():
 def main():
     try:
         log('Starting main app')
-        #db_session.global_init("db/sentiment.db")
+        # db_session.global_init("db/sentiment.db")
         # app.run(port=8080, host='127.0.0.1')
         app.run()
     except Exception as E:

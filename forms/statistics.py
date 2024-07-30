@@ -7,5 +7,5 @@ class StatisticsForm(FlaskForm):
     plot_type = SelectField("Вид графика", choices=[(1, 'Круговая диаграмма оценок'),
                                                     (2, 'Гистограмма'),
                                                     (3, 'Ящик с усами'),
-                                                    (4, 'Ящик без усов')])
+                                                    (4, 'График рассеяния')])
     submit = SubmitField('Построить график')
