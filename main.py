@@ -1,6 +1,7 @@
 #2024-03-29_1
 from flask import Flask, url_for, render_template, redirect, request, abort, flash
 # Импортируем нужные классы:
+from forms.text_admin import MessageForm
 from flask_login import LoginManager
 from flask_login import login_user
 from flask_login import login_required
@@ -12,6 +13,7 @@ from forms.user import RegisterForm, LoginForm
 from forms.feedback import FeedbackForm
 from forms.statistics import StatisticsForm
 from data.events import Events
+from data.messages import Messages
 from data.users import User
 from data.feedbacks import Feedbacks
 from data import db_session
@@ -101,7 +103,7 @@ def events():
     except Exception as e:
         with open('error_events.log', 'a') as f:
             traceback.print_exc(file=f)
-        log("Error rendering events:"+str(e))
+        log("Error rendering events:" + str(e))
         return str(e)
     return render_template('events.html', events=events)
 
@@ -514,9 +516,29 @@ def log(message, level='INFO'):
 
 
 # Сделаем обработчик адреса /Future_works (страничка с будущими доработками):
-@app.route('/text_admin')
-def future_works():
-    return render_template("text_admin.html", name='future_works')
+#@app.route('/text_admin')
+#def future_works():
+#    return render_template("text_admin.html", name='future_works')
+
+@app.route('/send_message', methods=['GET', 'POST'])
+#@login_required
+def send_message():
+    form = MessageForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        message = Messages(
+            subject=form.subject.data,
+            text=form.text.data,
+            user_id=current_user.id)
+        # Очистим поля формы
+        form.subject.data = ''
+        form.text.data = ''
+        # Сохраним запись в БД
+        db_sess.add(message)
+        db_sess.commit()
+        flash('Сообщение успешно отправлено.')
+        return render_template('add_message.html', form=form)
+    return render_template("add_message.html", form=form)
 
 
 # Обязательно сделаем обработчик адреса / /sentiment (т.к. это главная страница):

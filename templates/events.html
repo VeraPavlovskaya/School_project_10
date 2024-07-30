@@ -13,12 +13,12 @@
 
 {% for event in events %}
 	<div class="shadow p-3 mb-5 bg-body rounded">
-		<h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
+		<h2><a href="{{ url_for('feedbacks', event_id=event.id)}}">{{ event.title }}</a></h2>
 		{{ event.event_date_time }}
 		</br>
 		{{ event.description|safe }}
 
-		<div class="card mb-3">
+		<!--<div class="card mb-3">-->
 			<div class="row no-gutters">
 				<div class="col-md-2">
 					{% if event.event_picture %}
@@ -28,7 +28,7 @@
 					{% endif %}
 				</div>
 			</div>
-		</div>
+		<!--</div>-->
 
 		<small>Добавлено пользователем: {{ event.event_poster.name }}<br/>
 			   {{ event.created_date }}

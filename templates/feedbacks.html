@@ -14,7 +14,7 @@
 {{ event.event_date_time }}
 </br>
 {{ event.description|safe }}
-<div class="card mb-3">
+<!--<div class="card mb-3"> -->
     <div class="row no-gutters">
         <div class="col-md-2">
             {% if event.event_picture %}
@@ -24,7 +24,7 @@
             {% endif %}
         </div>
     </div>
-</div>
+<!--</div> -->
 
 {% for feedback in feedbacks %}
 	<div class="shadow p-3 mb-5 bg-body rounded">
