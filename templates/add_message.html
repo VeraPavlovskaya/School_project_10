@@ -10,6 +10,7 @@
 {% endfor %}
 
 {% if current_user.is_authenticated %}
+
     <div class="shadow p-3 mb-5 bg-body rounded">
         <form method="POST">
             {{ form.hidden_tag() }}
@@ -27,7 +28,8 @@
 
     </div>
 {% else %}
-	<h2> Для написания администратору необходимо войти в систему...</h2>
+	<h2 style="color: white;"> Для написания администратору необходимо войти в систему...</h2>
+
 	<a href="{{ url_for('login') }}">Вход в систему</a>
 {% endif %}
 

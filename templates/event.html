@@ -11,8 +11,8 @@
 
 <br/>
 
-<div class="shadow p-3 mb-5 bg-body rounded">
-	<h2>{{ event.title }}</h2>
+<div class="shadow p-3 mb-5 bg-body rounded" style="color: white;">
+	<h2 style="color: white;">{{ event.title }}</h2>
 
     {{ event.event_date_time }}
 
@@ -31,7 +31,7 @@
 	{{ event.description|safe }}
     <br/><br/>
 
-    <small>Добавлено пользователем: {{ event.event_poster.name }}<br/>
+    <small >Добавлено пользователем: {{ event.event_poster.name }}<br/>
            {{ event.created_date }}
     </small>
 

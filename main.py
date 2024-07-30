@@ -497,12 +497,37 @@ def graphics():
         elif form.plot_type.data == "2":
             plt.clf()
             df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
-            y = pd.DataFrame((df["user_score"]))
-            plt.hist(y['user_score'])
+            y = df["user_score"]
+            plt.hist(y, bins=10, edgecolor='black')
             plot_file_name = 'feedbacks_hist.png'
             plt.savefig(GRAPHS_FOLDER + plot_file_name)
-        log("form.plot_type.data=" + form.plot_type.data)
-        log("plot_file_name=" + plot_file_name)
+        # Ящик с усами
+        elif form.plot_type.data == "3":
+            plt.clf()
+            df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
+            y = df["user_score"]
+
+            # Преобразование данных в числовой тип и удаление NaN значений
+            y = pd.to_numeric(y, errors='coerce')
+            y = y.dropna()
+
+            plt.boxplot(y)
+            plot_file_name = 'feedbacks_boxplot.png'
+            plt.savefig(GRAPHS_FOLDER + plot_file_name)
+            log("form.plot_type.data=" + form.plot_type.data)
+            log("plot_file_name=" + plot_file_name)
+        # График рассеяния
+        elif form.plot_type.data == "4":
+            plt.clf()
+            df = pd.read_sql_query("SELECT * FROM feedbacks", db_session.CONNECTION)
+            print(df.columns)  # Вывод названий столбцов для отладки
+            y = df["user_score"]
+
+            plt.scatter(range(len(y)), y)
+            plot_file_name = 'feedbacks_scatter.png'
+            plt.savefig(GRAPHS_FOLDER + plot_file_name)
+            log("form.plot_type.data=" + form.plot_type.data)
+            log("plot_file_name=" + plot_file_name)
         return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
 
     return render_template('statistics.html', form=form, plot_file_name=plot_file_name)
@@ -511,30 +536,7 @@ def graphics():
 ########################################################################################################################
 ## Other stuff
 ########################################################################################################################
-'''@app.route('/events/add', methods=['GET', 'POST'])
-def add_message():
-    form = EventForm()
-    db_sess = db_session.create_session()
-    # Обработка метода POST
-    if form.validate_on_submit():
-        # Сформируем объект мероприятия для добавления в БД из данных формы
-        event = Events(title=form.title.data,
-                       description=form.description.data,
-                       event_date_time=form.event_date_time.data,
-                       poster_id=current_user.id)
-        # Очистим поля формы
-        form.title.data = ''
-        form.description.data = ''
-        form.event_date_time.data = ''
-        # form.event_picture = ''
-        # Сохраним запись в БД
-        db_sess.add(event)
-        db_sess.commit()
 
-        flash("Новое письмо отправлено успешно, ожидайте ответа администратора")
-    # Обработчик метода GET
-    return render_template("add_event.html", form=form)
-'''
 
 
 def log(message, level='INFO'):
@@ -544,14 +546,7 @@ def log(message, level='INFO'):
         app.logger.exception(message)
 
 
-# Сделаем обработчик адреса /Future_works (страничка с будущими доработками):
-#@app.route('/text_admin')
-#def future_works():
- #   return render_template("add_message.html", name='future_works')
-
-
 @app.route('/send_message', methods=['GET', 'POST'])
-@login_required
 def send_message():
     form = MessageForm()
     if form.validate_on_submit():
@@ -579,11 +574,6 @@ def sentiment():
     db_session.global_init("db/sentiment.db")
     log("Initialized DB")
 
-    #   music_playing = False
-
-    #    if request.method == 'POST':
-    #       if 'toggle_music' in request.form:
-    #          music_playing = not music_playing
 
     return render_template("index.html")
 

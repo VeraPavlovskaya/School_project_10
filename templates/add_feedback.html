@@ -11,16 +11,18 @@
 
 {% if current_user.is_authenticated %}
 
-	<h1>Добавить отзыв</h1>
+	<h1 style="color: white;">Добавить отзыв</h1>
 	<br/>
 </br>
 <h2><a href="{{ url_for('event', id=event.id)}}">{{ event.title }}</a></h2>
-{{ event.event_date_time }}
-</br>
-{{ event.description|safe }}
-</br>
+<div style="color: white;">
+	{{ event.event_date_time }}
+	</br>
+	{{ event.description|safe }}
+	</br>
+</div>
 
-	<div class="shadow p-3 mb-5 bg-body rounded">
+	<div class="shadow p-3 mb-5 bg-body rounded" style="color: white;">
 		<form action="" method="POST">
 			{{ form.hidden_tag() }}
 
@@ -47,7 +49,7 @@
 
 	</div>
 {% else %}
-	<h2> Для создания мероприятия необходимо войти в систему...</h2>
+	<h2 style="color: white;"> Для создания отзыва по мероприятию необходимо войти в систему...</h2>
 	<a href="{{ url_for('login') }}">Вход в систему</a>
 {% endif %}
 

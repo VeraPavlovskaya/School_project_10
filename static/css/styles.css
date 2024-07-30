@@ -74,8 +74,8 @@ input[type="file"]{
 label{
     box-sizing: border-box;
     font-size: 20px;
-    background-color: black;
-    color:white
+    background-color: white;
+    color: white;
     border:1px solid #3498db;
     padding: 2px 15px;
     border-radius: 5px;
@@ -83,7 +83,7 @@ label{
 }
 label:hover{
     background-color: #3498db;
-    color: black;
+    color: white;
 }
 .box:hover{
     width: 360px;
