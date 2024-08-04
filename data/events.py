@@ -13,6 +13,10 @@ class Events(SqlAlchemyBase):
     event_picture = db.Column(db.VARCHAR, nullable=True)
     event_date_time = db.Column(db.DateTime, default=datetime.datetime.now)
     created_date = db.Column(db.DateTime, default=datetime.datetime.now)
+    school_num = db.Column(db.VARCHAR, nullable=True)
+    location = db.Column(db.VARCHAR, nullable=True)
+    organizer = db.Column(db.VARCHAR, nullable=True)
+    contacts = db.Column(db.VARCHAR, nullable=True)
     # Foreign key
     poster_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))

@@ -29,7 +29,7 @@ import logging
 import json
 import traceback
 from werkzeug.exceptions import HTTPException
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_
 
 app = Flask(__name__)
 ckeditor = CKEditor(app)
@@ -93,12 +93,15 @@ def events():
         print('searched_text=', srch_txt)
         print('searched_text_lower=', srch_txt_cml)
         events = db_sess.query(Events).filter(
-                    or_(Events.title.ilike(srch_txt),
-                        Events.description.ilike(srch_txt),
-                        Events.title.ilike(srch_txt_cml),
-                        Events.description.ilike(srch_txt_cml),
-                        Events.title.ilike(srch_txt_upr),
-                        Events.description.ilike(srch_txt_upr)
+                    and_(
+                        or_(Events.title.ilike(srch_txt),
+                            Events.description.ilike(srch_txt),
+                            Events.title.ilike(srch_txt_cml),
+                            Events.description.ilike(srch_txt_cml),
+                            Events.title.ilike(srch_txt_upr),
+                            Events.description.ilike(srch_txt_upr)
+                            ),
+                        or_(Events.school_num == current_user.school_num, current_user.id == 1)
                         )
                     ).order_by(Events.event_date_time)
     except Exception as e:
@@ -137,11 +140,20 @@ def add_event():
                        description=form.description.data,
                        event_date_time=form.event_date_time.data,
                        event_picture=pic_filename,
-                       poster_id=current_user.id)
+                       poster_id=current_user.id,
+                       school_num=form.school_num.data,
+                       location=form.location.data,
+                       organizer=form.organizer.data,
+                       contacts=form.contacts.data
+                       )
         # Очистим поля формы
         form.title.data = ''
         form.description.data = ''
         form.event_date_time.data = ''
+        form.school_num = ''
+        form.location = ''
+        form.organizer = ''
+        form.contacts = ''
         # form.event_picture = ''
         # Сохраним запись в БД
         db_sess.add(event)
@@ -165,6 +177,10 @@ def edit_event(id):
         event.title = form.title.data
         event.description = form.description.data
         event.event_date_time = form.event_date_time.data
+        event.school_num = form.school_num.data
+        event.location = form.location.data
+        event.organizer = form.organizer.data
+        event.contacts = form.contacts.data
         # Если добавлена картинка, сохраним её на сервере, а имя файла запишем в БД
         if request.files['event_picture']:
             pic_filename = 'evt_' + str(uuid.uuid1()) + '.pic'
@@ -184,6 +200,10 @@ def edit_event(id):
         form.title.data = event.title
         form.description.data = event.description
         form.event_date_time.data = event.event_date_time
+        form.school_num.data = event.school_num
+        form.location.data = event.location
+        form.organizer.data = event.organizer
+        form.contacts.data = event.contacts
         return render_template('edit_event.html', form=form)
 
 

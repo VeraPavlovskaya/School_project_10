@@ -11,10 +11,20 @@
 
 </br>
 
+<a href="{{ url_for('add_event')}}" class="btn btn-info btn-sm">Создать новое мероприятие</a>
+
 {% for event in events %}
 	<div class="shadow p-3 mb-5 bg-body rounded" style="color: white;">
 		<h2><a href="{{ url_for('feedbacks', event_id=event.id)}}">{{ event.title }}</a></h2>
 		{{ event.event_date_time }}
+		</br>
+		{{ event.school_num }}
+		</br>
+		{{ event.location }}
+		</br>
+		{{ event.organizer }}
+		</br>
+		{{ event.contacts }}
 		</br>
 		{{ event.description|safe }}
 
@@ -47,7 +57,5 @@
 	<br/>
 {% endfor %}
 <br/>
-
-<a href="{{ url_for('add_event')}}" class="btn btn-info btn-sm">Создать мероприятие</a>
 
 {% endblock %}

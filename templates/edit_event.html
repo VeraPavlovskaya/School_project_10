@@ -27,6 +27,12 @@
 
 			{{ form.event_date_time(class="DateTimeField") }}
 			<br/>
+            {{ form.school_num.label(class="form-label") }}
+			{{ form.school_num(class="form-control") }}
+			<br/>
+            {{ form.location.label(class="form-label") }}
+			{{ form.location(class="form-control") }}
+			<br/>
 
 			{{ form.event_picture(class="form-control") }}
 			<br/>
@@ -35,7 +41,12 @@
 
 			{{ form.description(class="form-control", rows="10") }}
 			<br/>
-
+			{{ form.organizer.label(class="form-label") }}
+			{{ form.organizer(class="form-control") }}
+			<br/>
+            {{ form.contacts.label(class="form-label") }}
+			{{ form.contacts(class="form-control") }}
+			<br/>
 
 			{{ form.submit(class="btn btn-primary") }}
 
